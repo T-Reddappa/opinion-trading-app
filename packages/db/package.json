@@ -1,0 +1,17 @@
+{
+  "name": "@repo/db",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "@types/mongoose": "^5.11.97",
+    "mongoose": "^7.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,17 @@
+// tsconfig.json (in root directory)
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@repo/db/*": ["packages/db/*"],
+      "@repo/*": ["packages/*"]
+    }
+  }
+}
