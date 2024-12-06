@@ -1,4 +1,4 @@
-import { Document, Types } from "mongoose";
+import { Date, Document, Schema, Types } from "mongoose";
 
 export interface IUser extends Document {
   username: string;
@@ -63,8 +63,8 @@ export interface IOrder extends Document {
   createdAt?: String;
   userId: Types.ObjectId;
   marketId: Types.ObjectId;
-  orderType: string;
-  side: String;
+  orderType: "market" | "limit";
+  side: "buy" | "sell";
   quantity: Number;
   price: Number;
   status: String;
@@ -75,4 +75,16 @@ export interface ICategory extends Document {
   name: String;
   icon: String;
   markets: Types.ObjectId[];
+}
+
+export interface ITrade extends Document {
+  orderId: string;
+  marketId: Schema.Types.ObjectId;
+  matchedOrderId: string;
+  price: Number;
+  quantity: number;
+  stockType: "yes" | "no";
+  buyerId: Schema.Types.ObjectId;
+  sellerId: Schema.Types.ObjectId;
+  executedAt: Date;
 }

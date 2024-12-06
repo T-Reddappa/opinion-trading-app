@@ -5,6 +5,7 @@ import { Request, Response } from "express";
 
 interface JWTPayload {
   userId: string;
+  username: string;
   // Add any other properties you typically include in your JWT
   // For example: email?: string, role?: string, etc.
 }
@@ -40,8 +41,9 @@ export const createUser = async (req: Request, res: Response) => {
       SECRET_KEY
     );
 
-    const userData = user.toObject();
-    delete userData.password;
+    const { password: _, ...userData } = user.toObject();
+
+    // delete userData.password;
 
     res.status(201).json({
       message: "User registered successfully",
@@ -50,6 +52,39 @@ export const createUser = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Registration error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const claimBonus = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user._id;
+    const { bonusAmount } = req.body;
+    // const inrBalance = new InrBalance({
+    //   userId: user._id,
+    //   balance: 0,
+    //   locked: 0,
+    // });
+    const userBalance = await InrBalance.findOne({ userId });
+
+    if (!userBalance) {
+      const newBalance = new InrBalance({
+        userId: userId,
+        balance: 0,
+        locked: 0,
+      });
+      await newBalance.save();
+      return;
+    }
+
+    await userBalance?.updateOne({ $inc: { balance: bonusAmount } });
+
+    res.status(200).json({
+      message: "Claimed bonus",
+      balance: userBalance,
+    });
+  } catch (error) {
+    console.log("bonus claim error", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -85,8 +120,7 @@ export const login = async (req: Request, res: Response) => {
 
     const inrBalance = await InrBalance.findOne({ userId: user._id });
 
-    const userData = user.toObject();
-    delete userData.password;
+    const { password: _, ...userData } = user.toObject();
 
     res.status(200).json({
       message: "Login Successful",

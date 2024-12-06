@@ -3,8 +3,9 @@ const express = require("express");
 // import dotenv from "dotenv";
 
 import { connectDB } from "@repo/db/";
-import { userRouter } from "./routes/userRoute";
+import { userRouter } from "./routes/user";
 import { orderRouter } from "./routes/order";
+import { marketRouter } from "./routes/market";
 // dotenv.config({ path: "../../.env" });
 
 const PORT = 3001;
@@ -18,6 +19,7 @@ connectDB()
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/order", orderRouter);
+app.use("/api/v1/market", marketRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("<h3>TRADING APP</h3>");

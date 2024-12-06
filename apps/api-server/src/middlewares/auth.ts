@@ -30,12 +30,12 @@ export const validateRegistration = async (
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex) {
+    if (!emailRegex.test(email)) {
       res.status(400).json({ error: "Invalid email format" });
       return;
     }
 
-    if (password?.length < 7) {
+    if (password?.length < 8) {
       res
         .status(400)
         .json({ error: "Password must be at least 8 characters long" });
@@ -52,14 +52,16 @@ export const validateRegistration = async (
     });
 
     if (existingUser) {
-      res.status(409).json({ error: "Username or email already exist" });
+      res.status(409).json({ error: "Username or email already exists" });
       return;
     }
 
     next();
   } catch (error) {
-    console.error("Validation error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Registration validation error:", error);
+    res
+      .status(500)
+      .json({ error: "Internal server error during registration validation" });
   }
 };
 
@@ -69,7 +71,14 @@ export const authMiddleware = async (
   next: NextFunction
 ) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith("Bearer ")) {
+      res
+        .status(401)
+        .json({ error: 'Authorization header must start with "Bearer"' });
+    }
+
+    const token = authHeader?.split(" ")[1];
     if (!token) {
       res.status(401).json({ error: "No token provided" });
       return;
@@ -77,7 +86,8 @@ export const authMiddleware = async (
 
     const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
 
-    const user = await User.findOne(decoded.userId);
+    const user = await User.findOne({ _id: decoded.userId });
+    console.log(user);
     if (!user) {
       res.status(401).json({ error: "User not found" });
       return;

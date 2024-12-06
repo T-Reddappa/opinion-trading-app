@@ -1,10 +1,11 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import {
   ICategory,
   IInrBalance,
   IMarket,
   IOrder,
   IStockBalance,
+  ITrade,
   IUser,
 } from "../types/user";
 
@@ -12,7 +13,7 @@ const userSchema = new mongoose.Schema(
   {
     username: { type: String, unique: true, alias: "user_id", required: true },
     email: { type: String, unique: true, required: true },
-    password: { type: String, required: true, select: false },
+    password: { type: String, select: false },
     avatarUrl: { type: String, default: null },
     inrBalances: [{ type: mongoose.Schema.Types.ObjectId, ref: "InrBalance" }],
     stockBalances: [
@@ -118,6 +119,18 @@ const categorySchema = new mongoose.Schema({
   markets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Market" }],
 });
 
+const TradeSchema = new Schema({
+  orderId: { type: String, required: true },
+  marketId: { type: String, required: true },
+  matchedOrderId: { type: String, required: true },
+  price: { type: Number, required: true },
+  quantity: { type: Number, required: true },
+  stockType: { type: String, enum: ["yes", "no"], required: true },
+  buyerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  sellerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  executedAt: { type: Date, default: Date.now },
+});
+
 export const User = mongoose.model<IUser>("User", userSchema);
 export const InrBalance = mongoose.model<IInrBalance>(
   "InrBalance",
@@ -130,3 +143,4 @@ export const StockBalance = mongoose.model<IStockBalance>(
 export const Market = mongoose.model<IMarket>("Market", marketSchema);
 export const Order = mongoose.model<IOrder>("Order", orderSchema);
 export const Category = mongoose.model<ICategory>("Category", categorySchema);
+export const Trade = mongoose.model<ITrade>("Trade", TradeSchema);
